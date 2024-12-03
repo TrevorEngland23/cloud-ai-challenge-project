@@ -1,7 +1,79 @@
 ﻿@page "/"
-
+@using Azure;
+@using Azure.AI.Vision.ImageAnalysis;
+@using System;
+@using System.IO;
+@rendermode InteractiveServer
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Computer Vision</h1>
 
-Welcome to your new app.
+<p>Insert url or type prompt.</p>
+<textarea @bind="url" rows="1" cols="50" placeholder="Enter url to analyze or prompt to generate image"></textarea>
+<br>
+<button @onclick="AnalyzeImage">Analyze Image</button>
+<button @onclick="GenerateImage">Generate Image</button>
+
+@code
+{
+
+    
+    string url = "";
+
+    void AnalyzeImage()
+    {
+        var serviceOptions = new VisionServiceOptions(Environment.GetEnvironmentVariable("VISION_ENDPOINT"), new AzureKeyCredential(Environment.GetEnvironmentVariable("VISION_KEY")));
+
+        using var imageSource = VisionSource.FromUrl(new Uri("https://learn.microsoft.com/azure/ai-services/computer-vision/media/quickstarts/presentation.png"));
+
+        var analysisOptions = new ImageAnalysisOptions()
+        {
+            Features = ImageAnalysisFeature.Caption | ImageAnalysisFeature.Text,
+
+            Language = "en",
+
+            GenderNeutralCaption = true
+        };
+
+        using var analyzer = new ImageAnalyzer(serviceOptions, imageSource, analysisOptions);
+
+        var result = analyzer.Analyzer();
+
+        if (result.Reason == ImageAnalysisResultReason.Analyzed)
+        {
+            if (result.Caption != null)
+            {
+                Console.WriteLine(" Caption:");
+                Console.WriteLine($" \"{result.Caption.Content}\", Confidence {result.Caption.Confidence:0.0000}");
+            }
+
+            if (result.Text != null)
+            {
+                Console.WriteLine($" Text:");
+                foreach (var line in result.Text.Lines)
+                {
+                    string pointsToString = "{" + string.Join(',', line.BoundingPolygon.Select(pointsToString => pointsToString.ToString())) + "}";
+                    Console.WriteLine($" Line: '{line.Content}', Bounding polygon {pointsToString}");
+
+                    foreach (var word in line.Words)
+                    {
+                        pointsToString = "{" + string.Join(',', word.BoundingPolygon.Select(pointsToString => pointsToString.ToString())) + "}";
+                        Console.WriteLine($" Word: '{word.Content}', Bounding polygon {pointsToString}, Confidence {word.Confidence:0.0000}");
+                    }
+                }
+            }
+        }
+        else{
+            var errorDetails = ImageAnalysisErrorDetails.FromResult(result);
+            Console.WriteLine(" Analysis failed.");
+            Console.WriteLine($ "Error reason: {errorDetails.Reason}");
+            Console.WriteLine($ "Error code : {errorDetails.ErrorCode}");
+            Console.WriteLine($ " Error message: {errorDetails.Message}");
+        }
+    }
+
+    void GenerateImage()
+    {
+
+    }
+}
