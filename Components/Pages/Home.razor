@@ -23,7 +23,10 @@
 </div>
 <br>
 
-<p id="caption">@caption</p>
+<div id="caption">
+<strong>AI Generated Summary: </strong> 
+<span>@caption</span>
+</div>
 
 @inject IConfiguration Configuration
 @code
@@ -78,6 +81,10 @@
         {
             Size = GeneratedImageSize.W1024xH1024
         });
+
+    urlPrompt = imageGeneration.Value.ImageUri.ToString();
+
+    StateHasChanged();
 
         // Use the result to display the generated image
         Console.WriteLine("Image generated successfully!");
