@@ -13,13 +13,27 @@
 <h1>Computer Vision</h1>
 
 <p>Insert url or type prompt.</p>
-<textarea @bind="urlPrompt" rows="5" cols="50" placeholder="Enter url to analyze or prompt to generate image"></textarea>
-<br>
-<button @onclick="AnalyzeImage">Analyze Image</button>
-<button @onclick="GenerateImage">Generate Image</button>
+<div>
+    <textarea @bind="urlPrompt" rows="5" cols="50" placeholder="Enter url to analyze or prompt to generate image"></textarea>
+    <br>
+    <button @onclick="AnalyzeImage">Analyze Image</button>
+    <button @onclick="GenerateImage">Generate Image</button>
+</div>
 
 <div class="image-container">
-    <img src="@urlPrompt" />
+    @if (isLoading)
+    {
+        <div class="loading-animation">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(urlPrompt))
+    {
+        <img src="@urlPrompt" />
+    }
+ 
 </div>
 <br>
 
@@ -34,6 +48,8 @@
     string urlPrompt = "";
 
     string caption = "";
+
+    bool isLoading = false;
     void AnalyzeImage()
     {
         var endpoint = Configuration["Vision:endpoint"];
@@ -67,6 +83,10 @@
     }
     async void GenerateImage()
     {
+        try{
+            isLoading = true; 
+            StateHasChanged();
+        
         var endpoint = Configuration["Generate:endpoint"];
         var key = Configuration["Generate:key"];
 
@@ -75,22 +95,29 @@
             new AzureKeyCredential(key));
 
         ImageClient chatClient = azureClient.GetImageClient("dall-e-2");
-
-        var imageGeneration = await chatClient.GenerateImageAsync(urlPrompt,
+         var imageGeneration = await chatClient.GenerateImageAsync(urlPrompt,
         new ImageGenerationOptions()
+        
         {
             Size = GeneratedImageSize.W1024xH1024
         });
 
-    urlPrompt = imageGeneration.Value.ImageUri.ToString();
-
-    StateHasChanged();
+        caption = urlPrompt;
+        urlPrompt = imageGeneration.Value.ImageUri.ToString();
+        Console.WriteLine(imageGeneration.Value.ImageUri);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"Error generating image: {e.Message}");
+    }
+    finally{
+        isLoading = false;
+        StateHasChanged();
+    }
 
         // Use the result to display the generated image
-        Console.WriteLine("Image generated successfully!");
-    
-
-    Console.WriteLine(imageGeneration.Value.ImageUri);
+        Console.WriteLine("Image generated successfully!"); 
+        
        
 
     }
