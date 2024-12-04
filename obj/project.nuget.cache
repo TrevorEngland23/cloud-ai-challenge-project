@@ -1,12 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "BAs9V2dWd8I=",
+  "dgSpecHash": "hjdKz0tJDJg=",
   "success": true,
   "projectFilePath": "/workspaces/cloud-ai-challenge-project/cloud-ai-challenge-project.csproj",
   "expectedPackageFiles": [
+    "/home/vscode/.nuget/packages/azure.ai.openai/2.0.0/azure.ai.openai.2.0.0.nupkg.sha512",
     "/home/vscode/.nuget/packages/azure.ai.vision.imageanalysis/1.0.0/azure.ai.vision.imageanalysis.1.0.0.nupkg.sha512",
     "/home/vscode/.nuget/packages/azure.core/1.44.1/azure.core.1.44.1.nupkg.sha512",
     "/home/vscode/.nuget/packages/microsoft.bcl.asyncinterfaces/6.0.0/microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
+    "/home/vscode/.nuget/packages/openai/2.0.0/openai.2.0.0.nupkg.sha512",
     "/home/vscode/.nuget/packages/system.clientmodel/1.2.1/system.clientmodel.1.2.1.nupkg.sha512",
     "/home/vscode/.nuget/packages/system.diagnostics.diagnosticsource/6.0.1/system.diagnostics.diagnosticsource.6.0.1.nupkg.sha512",
     "/home/vscode/.nuget/packages/system.memory.data/6.0.0/system.memory.data.6.0.0.nupkg.sha512",

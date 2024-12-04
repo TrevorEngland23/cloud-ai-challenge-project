@@ -2,6 +2,23 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "Azure.AI.OpenAI/2.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Azure.Core": "1.43.0",
+          "OpenAI": "2.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Azure.AI.OpenAI.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.AI.OpenAI.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Azure.AI.Vision.ImageAnalysis/1.0.0": {
         "type": "package",
         "dependencies": {
@@ -52,6 +69,23 @@
         },
         "runtime": {
           "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "OpenAI/2.0.0": {
+        "type": "package",
+        "dependencies": {
+          "System.ClientModel": "1.1.0",
+          "System.Diagnostics.DiagnosticSource": "6.0.1"
+        },
+        "compile": {
+          "lib/net6.0/OpenAI.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/OpenAI.dll": {
             "related": ".xml"
           }
         }
@@ -193,6 +227,22 @@
     }
   },
   "libraries": {
+    "Azure.AI.OpenAI/2.0.0": {
+      "sha512": "U3VuEMqf3WZpGiv/EWNNHui/VWpNWI1FQ0cBUybdLuhrZooy84W4+WD777ZAI9W0tlDqmWysLtLLdzgmpqbNiA==",
+      "type": "package",
+      "path": "azure.ai.openai/2.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "CHANGELOG.md",
+        "README.md",
+        "azure.ai.openai.2.0.0.nupkg.sha512",
+        "azure.ai.openai.nuspec",
+        "azureicon.png",
+        "lib/netstandard2.0/Azure.AI.OpenAI.dll",
+        "lib/netstandard2.0/Azure.AI.OpenAI.xml"
+      ]
+    },
     "Azure.AI.Vision.ImageAnalysis/1.0.0": {
       "sha512": "ImGqg6uroJT0baxiRDq0mADC/xuv0k6i56i9pJG6adKMXKKc8HUbNNvYdvEnzn8GezmiKZXpt1G6+wPAopGJrw==",
       "type": "package",
@@ -250,6 +300,24 @@
         "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
         "microsoft.bcl.asyncinterfaces.nuspec",
         "useSharedDesignerContext.txt"
+      ]
+    },
+    "OpenAI/2.0.0": {
+      "sha512": "WI9e5tC15ZBt02scCp2gcHrjxQRVX2Ws3eUu/YsICqellH3MwdRggGujSZg69oBJMtk1AYmqb9l08ix0l5AcqQ==",
+      "type": "package",
+      "path": "openai/2.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "CHANGELOG.md",
+        "OpenAI.png",
+        "README.md",
+        "lib/net6.0/OpenAI.dll",
+        "lib/net6.0/OpenAI.xml",
+        "lib/netstandard2.0/OpenAI.dll",
+        "lib/netstandard2.0/OpenAI.xml",
+        "openai.2.0.0.nupkg.sha512",
+        "openai.nuspec"
       ]
     },
     "System.ClientModel/1.2.1": {
@@ -511,6 +579,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Azure.AI.OpenAI >= 2.0.0",
       "Azure.AI.Vision.ImageAnalysis >= 1.0.0"
     ]
   },
@@ -556,6 +625,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "Azure.AI.OpenAI": {
+            "target": "Package",
+            "version": "[2.0.0, )"
+          },
           "Azure.AI.Vision.ImageAnalysis": {
             "target": "Package",
             "version": "[1.0.0, )"

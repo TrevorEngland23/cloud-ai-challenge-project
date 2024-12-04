@@ -35,3 +35,5 @@
 /workspaces/cloud-ai-challenge-project/bin/Debug/net8.0/System.Memory.Data.dll
 /workspaces/cloud-ai-challenge-project/obj/Debug/net8.0/cloud-ai-challenge-project.csproj.AssemblyReference.cache
 /workspaces/cloud-ai-challenge-project/obj/Debug/net8.0/cloud-ai.775102C5.Up2Date
+/workspaces/cloud-ai-challenge-project/bin/Debug/net8.0/Azure.AI.OpenAI.dll
+/workspaces/cloud-ai-challenge-project/bin/Debug/net8.0/OpenAI.dll

@@ -10,6 +10,7 @@ a, .btn-link {
     color: #fff;
     background-color: #1b6ec2;
     border-color: #1861ac;
+    margin-top: 50px;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -48,4 +49,24 @@ h1:focus {
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
+}
+
+.image-container {
+    margin-top: 20px; /* Space between buttons and image */
+    height: 300px; /* Fixed height to reserve space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px dashed #ccc; /* Optional border for visibility */
+    /* background-color: lightgray; */ 
+}
+
+.image-container img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#caption {
+    text-align: center;
 }

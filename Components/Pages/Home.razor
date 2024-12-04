@@ -2,23 +2,32 @@
 @using Azure;
 @using Azure.AI.Vision.ImageAnalysis;
 @using System;
+@using System.IO;
+@using System.Threading.Tasks;
+@using Azure.AI.OpenAI;
+@using OpenAI.Images;
 @rendermode InteractiveServer
+
 <PageTitle>Home</PageTitle>
 
 <h1>Computer Vision</h1>
 
 <p>Insert url or type prompt.</p>
-<textarea @bind="urlPrompt" rows="1" cols="50" placeholder="Enter url to analyze or prompt to generate image"></textarea>
+<textarea @bind="urlPrompt" rows="5" cols="50" placeholder="Enter url to analyze or prompt to generate image"></textarea>
 <br>
 <button @onclick="AnalyzeImage">Analyze Image</button>
 <button @onclick="GenerateImage">Generate Image</button>
 
-<p>@caption</p>
+<div class="image-container">
+    <img src="@urlPrompt" />
+</div>
+<br>
+
+<p id="caption">@caption</p>
 
 @inject IConfiguration Configuration
 @code
 {
-
     string urlPrompt = "";
 
     string caption = "";
@@ -53,9 +62,30 @@
                 }
             }
     }
-
-    void GenerateImage()
+    async void GenerateImage()
     {
+        var endpoint = Configuration["Generate:endpoint"];
+        var key = Configuration["Generate:key"];
+
+        AzureOpenAIClient azureClient = new(
+            new Uri(endpoint),
+            new AzureKeyCredential(key));
+
+        ImageClient chatClient = azureClient.GetImageClient("dall-e-2");
+
+        var imageGeneration = await chatClient.GenerateImageAsync(urlPrompt,
+        new ImageGenerationOptions()
+        {
+            Size = GeneratedImageSize.W1024xH1024
+        });
+
+        // Use the result to display the generated image
+        Console.WriteLine("Image generated successfully!");
+    
+
+    Console.WriteLine(imageGeneration.Value.ImageUri);
+       
 
     }
 }
+
