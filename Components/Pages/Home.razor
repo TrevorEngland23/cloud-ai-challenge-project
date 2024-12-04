@@ -38,40 +38,42 @@
 <br>
 
 <div id="caption">
-<strong>AI Generated Summary: </strong> 
-<span>@caption</span>
+    <strong>AI Generated Summary: </strong> 
+    <span>@caption</span>
 </div>
 
 @inject IConfiguration Configuration
 @code
 {
     string urlPrompt = "";
-
     string caption = "";
-
     bool isLoading = false;
     void AnalyzeImage()
     {
-        var endpoint = Configuration["Vision:endpoint"];
-        var key = Configuration["Vision:key"];
+        if (string.IsNullOrWhiteSpace(urlPrompt))
+        {
+            caption = "Please enter a valid URL to analyze.";
+            StateHasChanged();
+            return;
+        }
 
-       ImageAnalysisClient client = new ImageAnalysisClient(
-            new Uri(endpoint),
-            new AzureKeyCredential(key));
+        try
+        {
+            var endpoint = Configuration["Vision:endpoint"];
+            var key = Configuration["Vision:key"];
 
-        ImageAnalysisResult result = client.Analyze(
-            new Uri(urlPrompt), 
-            VisualFeatures.Caption | VisualFeatures.Read, 
-            new ImageAnalysisOptions { GenderNeutralCaption = true});
+            ImageAnalysisClient client = new ImageAnalysisClient(new Uri(endpoint),new AzureKeyCredential(key));
 
-        Console.WriteLine("Image analysis results:");
-        Console.WriteLine(" Caption:");
-        caption = result.Caption.Text;
-        StateHasChanged();
-        Console.WriteLine($"    '{result.Caption.Text}', Confidence {result.Caption.Confidence:F4}");
+            ImageAnalysisResult result = client.Analyze(new Uri(urlPrompt), VisualFeatures.Caption | VisualFeatures.Read, new ImageAnalysisOptions { GenderNeutralCaption = true});
 
-        Console.WriteLine(" Read:");
-        foreach (DetectedTextBlock block in result.Read.Blocks)
+            Console.WriteLine("Image analysis results:");
+            Console.WriteLine(" Caption:");
+            caption = result.Caption.Text;
+            StateHasChanged();
+            Console.WriteLine($"    '{result.Caption.Text}', Confidence {result.Caption.Confidence:F4}");
+
+            Console.WriteLine(" Read:");
+            foreach (DetectedTextBlock block in result.Read.Blocks)
             foreach (DetectedTextLine line in block.Lines)
             {
                 Console.WriteLine($"    Line: '{line.Text}', Bounding Polygon: [{string.Join(" ", line.BoundingPolygon)}]");
@@ -80,46 +82,51 @@
                     Console.WriteLine($"    Word: '{word.Text}', Confidence {word.Confidence.ToString("#.####")}, Bounding Polygon: [{string.Join(" ", word.BoundingPolygon)}]");
                 }
             }
+        }
+        catch (Exception e)
+        {
+            caption = $"Error analyzing image: {e.Message}";
+        }
     }
     async void GenerateImage()
     {
-        try{
+        if (string.IsNullOrWhiteSpace(urlPrompt))
+        {
+            caption = "Please enter a prompt or URL.";
+            StateHasChanged();
+            return;
+        }
+        try
+        {
             isLoading = true; 
             StateHasChanged();
         
-        var endpoint = Configuration["Generate:endpoint"];
-        var key = Configuration["Generate:key"];
+            var endpoint = Configuration["Generate:endpoint"];
+            var key = Configuration["Generate:key"];
 
-        AzureOpenAIClient azureClient = new(
-            new Uri(endpoint),
-            new AzureKeyCredential(key));
+            AzureOpenAIClient azureClient = new(new Uri(endpoint),new AzureKeyCredential(key));
 
-        ImageClient chatClient = azureClient.GetImageClient("dall-e-2");
-         var imageGeneration = await chatClient.GenerateImageAsync(urlPrompt,
-        new ImageGenerationOptions()
-        
+            ImageClient chatClient = azureClient.GetImageClient("dall-e-2");
+            var imageGeneration = await chatClient.GenerateImageAsync(urlPrompt,new ImageGenerationOptions()
+            {
+                Size = GeneratedImageSize.W1024xH1024
+            });
+
+            caption = urlPrompt;
+            urlPrompt = imageGeneration.Value.ImageUri.ToString();
+            Console.WriteLine(imageGeneration.Value.ImageUri);
+        }
+        catch (Exception e)
         {
-            Size = GeneratedImageSize.W1024xH1024
-        });
-
-        caption = urlPrompt;
-        urlPrompt = imageGeneration.Value.ImageUri.ToString();
-        Console.WriteLine(imageGeneration.Value.ImageUri);
-    }
-    catch (Exception e)
-    {
-        Console.WriteLine($"Error generating image: {e.Message}");
-    }
-    finally{
-        isLoading = false;
-        StateHasChanged();
-    }
+            Console.WriteLine($"Error generating image: {e.Message}");
+        }
+        finally{
+            isLoading = false;
+            StateHasChanged();
+        }
 
         // Use the result to display the generated image
         Console.WriteLine("Image generated successfully!"); 
-        
-       
-
     }
 }
 
