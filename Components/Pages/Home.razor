@@ -12,6 +12,16 @@
 
 <h1>Computer Vision</h1>
 
+
+@if (!isConfigured)
+{
+    <div class="warning-message">
+        <h2>Application Configuration Issue</h2>
+        <p>The app is not configured properly. Please ensure all required Azure AI service environment variables are set.</p>
+    </div>
+}
+else
+{
 <p>Insert url or type prompt.</p>
 <div>
     <textarea @bind="urlPrompt" rows="5" cols="50" placeholder="Enter url to analyze or prompt to generate image"></textarea>
@@ -44,14 +54,76 @@
     <span>@caption</span>
 </div>
 
+<div id="blobUrl">
+    <strong>URL: </strong>
+    <span>@blobUrl</span>
+</div>
+}
+
 @inject IConfiguration Configuration
 @code
 {
     string urlPrompt = "";
     string caption = "";
     bool isLoading = false;
+    string blobUrl = "";
+    bool isConfigured;
+
+     protected override void OnInitialized()
+    {
+        isConfigured = CheckConfiguration();
+        StateHasChanged();
+    }
+
+    bool CheckConfiguration()
+    {
+        var visionEndpoint = Configuration["Vision:endpoint"];
+        var visionKey = Configuration["Vision:key"];
+        var generateEndpoint = Configuration["Generate:endpoint"];
+        var generateKey = Configuration["Generate:key"];
+
+        return !string.IsNullOrWhiteSpace(visionEndpoint) &&
+               !string.IsNullOrWhiteSpace(visionKey) &&
+               !string.IsNullOrWhiteSpace(generateEndpoint) &&
+               !string.IsNullOrWhiteSpace(generateKey);
+    }
+
+     bool ValidateConfiguration(out string errorMessage)
+    {
+        if (!CheckConfiguration())
+        {
+            errorMessage = "Application is not properly configured. Missing necessary keys.";
+            return false;
+        }
+
+        var visionEndpoint = Configuration["Vision:endpoint"];
+        var visionKey = Configuration["Vision:key"];
+        var generateEndpoint = Configuration["Generate:endpoint"];
+        var generateKey = Configuration["Generate:key"];
+
+        if (string.IsNullOrWhiteSpace(visionEndpoint) || string.IsNullOrWhiteSpace(visionKey))
+        {
+            errorMessage = "Vision service is not properly configured.";
+            return false;
+        }
+        
+        if (string.IsNullOrWhiteSpace(generateEndpoint) || string.IsNullOrWhiteSpace(generateKey))
+        {
+            errorMessage = "Image generation service is not properly configured.";
+            return false;
+        }
+
+        errorMessage = string.Empty;
+        return true;
+    }
     void AnalyzeImage()
     {
+         if (!ValidateConfiguration(out string errorMessage))
+        {
+            caption = errorMessage;
+            StateHasChanged();
+            return;
+        }
         if (string.IsNullOrWhiteSpace(urlPrompt))
         {
             caption = "Please enter a valid URL to analyze.";
@@ -93,9 +165,19 @@
         {
             caption = $"Error analyzing image: {e.Message}";
         }
+        finally 
+        {
+            StateHasChanged();
+        }
     }
     async void GenerateImage()
     {
+         if (!ValidateConfiguration(out string errorMessage))
+        {
+            caption = errorMessage;
+            StateHasChanged();
+            return;
+        }
         if (string.IsNullOrWhiteSpace(urlPrompt))
         {
             caption = "Please enter a prompt or URL.";
@@ -121,6 +203,7 @@
 
             caption = urlPrompt;
             urlPrompt = imageGeneration.Value.ImageUri.ToString();
+            blobUrl = urlPrompt;
             Console.WriteLine(imageGeneration.Value.ImageUri);
         }
         catch (Exception e)
@@ -140,6 +223,7 @@
     {
         urlPrompt = string.Empty;
         caption = string.Empty;
+        blobUrl = string.Empty;
         StateHasChanged(); // Ensure the UI reflects the changes
     }
 
